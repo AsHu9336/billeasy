@@ -2,6 +2,23 @@ const Book = require('../models/Book');
 const Review = require('../models/Review');
 
 
+
+exports.searchBook =  async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.status(400).json({ message: 'Search query required' });
+
+  try {
+    const regex = new RegExp(q, 'i'); // case-insensitive regex
+    const results = await Book.find({
+      $or: [{ title: regex }, { author: regex }]
+    });
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+
 exports.createBook = async (req, res) => {
   try {
     const { title, author, genre } = req.body;
